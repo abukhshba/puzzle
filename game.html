@@ -22,17 +22,18 @@
       flex-direction: column;
       padding: 10px;
       overflow: hidden;
+      justify-content: flex-start;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 15px 20px;
+      padding: 12px 20px;
       background: rgba(255,255,255,0.1);
       backdrop-filter: blur(10px);
       border-radius: 15px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       flex-wrap: wrap;
       gap: 10px;
     }
@@ -80,8 +81,9 @@
       flex: 1;
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 20px;
+      align-items: flex-start;
+      padding: 10px 20px;
+      padding-top: 20px;
     }
 
     #puzzle {
@@ -162,13 +164,15 @@
       }
 
       .header {
-        padding: 8px;
-        margin-bottom: 5px;
-        border-radius: 0;
+        padding: 6px 8px;
+        margin-bottom: 10px;
+        border-radius: 8px;
       }
 
       .game-container {
-        padding: 5px;
+        padding: 0 5px;
+        padding-top: 15px;
+        align-items: flex-start;
       }
 
       #puzzle {
@@ -322,11 +326,24 @@
     </div>
   </div>
 
+  <!-- Time's Up Modal -->
+  <div class="modal" id="timeUpModal">
+    <div class="modal-content">
+      <h2>⏰ Time's Up!</h2>
+      <p>You ran out of time. Don't give up, try again!</p>
+      <div class="modal-buttons">
+        <button class="modal-button secondary" onclick="tryAgain()">🔄 Try Again</button>
+        <button class="modal-button" onclick="goHome()">🏠 Select Another Image</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const puzzle = document.getElementById("puzzle");
     const timerDisplay = document.getElementById("time");
     const timerElement = document.getElementById("timer");
     const successModal = document.getElementById("successModal");
+    const timeUpModal = document.getElementById("timeUpModal");
     const completionTimeSpan = document.getElementById("completionTime");
     
     let positions = [];
@@ -396,10 +413,10 @@
 
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
-          alert('⏰ Time\'s up! Try again!');
-          initPuzzle();
-          timeLeft = 60;
-          timerElement.classList.remove('warning');
+          gameCompleted = true; // Prevent further timer updates
+          setTimeout(() => {
+            timeUpModal.classList.add('show');
+          }, 300);
         }
       }, 1000);
     }
@@ -536,6 +553,14 @@
 
     function playAgain() {
       successModal.classList.remove('show');
+      gameCompleted = false;
+      timeLeft = 60;
+      timerElement.classList.remove('warning');
+      initPuzzle();
+    }
+
+    function tryAgain() {
+      timeUpModal.classList.remove('show');
       gameCompleted = false;
       timeLeft = 60;
       timerElement.classList.remove('warning');
