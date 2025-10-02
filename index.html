@@ -212,29 +212,82 @@
   </div>
 
   <script>
-    // Image database - Only images from the 'images' folder
-    const images = [
-      { id: 1, src: 'images/product.jpg', title: 'Product Image' },
-      { id: 2, src: 'images/photo1.jpeg', title: 'Photo 1' },
-      { id: 3, src: 'images/photo2.jpg', title: 'Photo 2' },
-      { id: 4, src: 'images/photo3.jpeg', title: 'Photo 3' },
-      { id: 5, src: 'images/photo4.jpg', title: 'Photo 4' },
-      { id: 6, src: 'images/photo5.jpeg', title: 'Photo 5' },
-      { id: 7, src: 'images/photo7.jpg', title: 'Photo 7' },
-      { id: 8, src: 'images/photo8.jpg', title: 'Photo 8' }
-    ];
-
     const gallery = document.getElementById('gallery');
+    let images = [];
+
+    // Automatically detect images in the 'images' folder
+    // Tries photo1, photo2, photo3... with common extensions
+    async function detectImages() {
+      const extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      const detectedImages = [];
+      let photoNumber = 1;
+
+      // Show loading state
+      gallery.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading images...</p></div>';
+
+      // Try to load images sequentially
+      while (true) {
+        let imageFound = false;
+
+        // Try each extension for this photo number
+        for (const ext of extensions) {
+          const imagePath = `images/photo${photoNumber}.${ext}`;
+
+          try {
+            // Check if image exists by trying to load it
+            const exists = await checkImageExists(imagePath);
+            if (exists) {
+              detectedImages.push({
+                id: photoNumber,
+                src: imagePath,
+                title: `Photo ${photoNumber}`
+              });
+              imageFound = true;
+              break; // Found this photo, move to next number
+            }
+          } catch (e) {
+            // Image doesn't exist, continue
+          }
+        }
+
+        // If no image found with this number, stop searching
+        if (!imageFound) {
+          break;
+        }
+
+        photoNumber++;
+
+        // Safety limit to prevent infinite loop
+        if (photoNumber > 100) break;
+      }
+
+      return detectedImages;
+    }
+
+    // Check if an image exists
+    function checkImageExists(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+    }
 
     // Load images into gallery
     function loadGallery() {
       gallery.innerHTML = '';
-      
+
+      if (images.length === 0) {
+        gallery.innerHTML = '<div class="loading"><p>No images found in the images folder.<br>Add images named photo1.jpg, photo2.jpg, etc.</p></div>';
+        return;
+      }
+
       images.forEach(image => {
         const card = document.createElement('div');
         card.className = 'image-card';
         card.onclick = () => startGame(image);
-        
+
         card.innerHTML = `
           <img src="${image.src}" alt="${image.title}" class="image-preview" loading="lazy">
           <div class="image-info">
@@ -242,7 +295,7 @@
             <button class="play-button">Play Puzzle</button>
           </div>
         `;
-        
+
         gallery.appendChild(card);
       });
     }
@@ -256,7 +309,12 @@
     }
 
     // Initialize gallery on page load
-    loadGallery();
+    async function init() {
+      images = await detectImages();
+      loadGallery();
+    }
+
+    init();
   </script>
 </body>
 </html>

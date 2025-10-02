@@ -94,9 +94,10 @@
       border-radius: 10px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.3);
       touch-action: none;
-      width: 85vw;
-      max-width: 500px;
       aspect-ratio: 2 / 3;
+      height: calc(100vh - 100px);
+      max-height: 85vh;
+      width: auto;
     }
 
     .piece {
@@ -139,7 +140,8 @@
 
       #puzzle {
         width: 90vw;
-        max-width: 450px;
+        height: auto;
+        max-height: none;
       }
 
       .timer {
@@ -171,7 +173,8 @@
 
       #puzzle {
         width: 95vw;
-        max-width: none;
+        height: auto;
+        max-height: calc(100dvh - 80px);
         gap: 1px;
         border-width: 2px;
         border-radius: 8px;
@@ -192,6 +195,7 @@
     @media (max-width: 360px) {
       #puzzle {
         width: 96vw;
+        max-height: calc(100dvh - 70px);
         border-width: 1px;
       }
     }
