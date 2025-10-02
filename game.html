@@ -302,7 +302,7 @@
   <div class="header">
     <button class="home-button" onclick="goHome()">🏠 Home</button>
     <div class="timer" id="timer">
-      ⏱️ <span id="time">2:00</span>
+      ⏱️ <span id="time">1:00</span>
     </div>
   </div>
 
@@ -331,7 +331,7 @@
     
     let positions = [];
     let dragged;
-    let timeLeft = 120; // 2 minutes in seconds
+    let timeLeft = 60; // 1 minute in seconds
     let timerInterval;
     let gameStartTime;
     let gameCompleted = false;
@@ -398,7 +398,7 @@
           clearInterval(timerInterval);
           alert('⏰ Time\'s up! Try again!');
           initPuzzle();
-          timeLeft = 120;
+          timeLeft = 60;
           timerElement.classList.remove('warning');
         }
       }, 1000);
@@ -537,7 +537,7 @@
     function playAgain() {
       successModal.classList.remove('show');
       gameCompleted = false;
-      timeLeft = 120;
+      timeLeft = 60;
       timerElement.classList.remove('warning');
       initPuzzle();
     }
