@@ -17,9 +17,11 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       padding: 10px;
+      overflow: hidden;
     }
 
     .header {
@@ -84,20 +86,23 @@
 
     #puzzle {
       display: grid;
-      grid-template-columns: repeat(3, 150px);
-      grid-template-rows: repeat(3, 150px);
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
       gap: 2px;
       border: 4px solid #fff;
       background: #fff;
       border-radius: 10px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.3);
       touch-action: none;
+      width: 85vw;
+      max-width: 500px;
+      aspect-ratio: 2 / 3;
     }
 
     .piece {
-      width: 150px;
-      height: 150px;
-      background-size: 450px 450px;
+      width: 100%;
+      height: 100%;
+      background-size: 300% 300%;
       cursor: grab;
       transition: transform 0.1s ease;
       position: relative;
@@ -119,15 +124,22 @@
 
     /* Mobile Responsive */
     @media (max-width: 768px) {
-      #puzzle {
-        grid-template-columns: repeat(3, 100px);
-        grid-template-rows: repeat(3, 100px);
+      body {
+        padding: 5px;
       }
 
-      .piece {
-        width: 100px;
-        height: 100px;
-        background-size: 300px 300px;
+      .header {
+        padding: 8px 10px;
+        margin-bottom: 10px;
+      }
+
+      .game-container {
+        padding: 5px;
+      }
+
+      #puzzle {
+        width: 90vw;
+        max-width: 450px;
       }
 
       .timer {
@@ -142,29 +154,45 @@
     }
 
     @media (max-width: 480px) {
-      #puzzle {
-        grid-template-columns: repeat(3, 80px);
-        grid-template-rows: repeat(3, 80px);
-      }
-
-      .piece {
-        width: 80px;
-        height: 80px;
-        background-size: 240px 240px;
-      }
-
-      .timer {
-        font-size: 1em;
-        padding: 6px 12px;
-      }
-
-      .home-button {
-        padding: 6px 12px;
-        font-size: 0.8em;
+      body {
+        padding: 0;
+        height: 100dvh; /* Dynamic viewport height for mobile */
       }
 
       .header {
-        padding: 10px;
+        padding: 8px;
+        margin-bottom: 5px;
+        border-radius: 0;
+      }
+
+      .game-container {
+        padding: 5px;
+      }
+
+      #puzzle {
+        width: 95vw;
+        max-width: none;
+        gap: 1px;
+        border-width: 2px;
+        border-radius: 8px;
+      }
+
+      .timer {
+        font-size: 0.9em;
+        padding: 6px 10px;
+      }
+
+      .home-button {
+        padding: 6px 10px;
+        font-size: 0.75em;
+      }
+    }
+
+    /* Extra small screens */
+    @media (max-width: 360px) {
+      #puzzle {
+        width: 96vw;
+        border-width: 1px;
       }
     }
 
@@ -310,36 +338,27 @@
       window.location.href = 'index.html';
     }
 
-    // Calculate piece size based on screen width
-    function getPieceSize() {
-      const width = window.innerWidth;
-      if (width <= 480) return 80;
-      if (width <= 768) return 100;
-      return 150;
-    }
-
     // Initialize puzzle
     function initPuzzle() {
-      const pieceSize = getPieceSize();
-      const totalSize = pieceSize * 3;
-      
-      puzzle.style.gridTemplateColumns = `repeat(3, ${pieceSize}px)`;
-      puzzle.style.gridTemplateRows = `repeat(3, ${pieceSize}px)`;
-      
       positions = [];
       puzzle.innerHTML = '';
 
-      // Create 9 pieces
-      for (let row = 0; row < 3; row++) {
-        for (let col = 0; col < 3; col++) {
+      // Create 9 pieces (3 columns × 3 rows)
+      const cols = 3;
+      const rows = 3;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
           const piece = document.createElement("div");
           piece.classList.add("piece");
-          piece.style.width = `${pieceSize}px`;
-          piece.style.height = `${pieceSize}px`;
           piece.style.backgroundImage = `url("${selectedImage.src}")`;
-          piece.style.backgroundSize = `${totalSize}px ${totalSize}px`;
-          piece.style.backgroundPosition = `-${col * pieceSize}px -${row * pieceSize}px`;
-          piece.dataset.correct = row * 3 + col;
+
+          // Calculate background position as percentage
+          const bgPosX = (col / (cols - 1)) * 100;
+          const bgPosY = (row / (rows - 1)) * 100;
+          piece.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
+
+          piece.dataset.correct = row * cols + col;
           piece.draggable = true;
           positions.push(piece);
         }
@@ -518,27 +537,6 @@
       timerElement.classList.remove('warning');
       initPuzzle();
     }
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      const currentPieceSize = getPieceSize();
-      const pieces = puzzle.querySelectorAll('.piece');
-      const totalSize = currentPieceSize * 3;
-      
-      puzzle.style.gridTemplateColumns = `repeat(3, ${currentPieceSize}px)`;
-      puzzle.style.gridTemplateRows = `repeat(3, ${currentPieceSize}px)`;
-      
-      pieces.forEach(piece => {
-        piece.style.width = `${currentPieceSize}px`;
-        piece.style.height = `${currentPieceSize}px`;
-        piece.style.backgroundSize = `${totalSize}px ${totalSize}px`;
-        
-        const correct = parseInt(piece.dataset.correct);
-        const row = Math.floor(correct / 3);
-        const col = correct % 3;
-        piece.style.backgroundPosition = `-${col * currentPieceSize}px -${row * currentPieceSize}px`;
-      });
-    });
 
     // Initialize game
     initPuzzle();

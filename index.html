@@ -16,6 +16,7 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       padding: 20px;
+      overflow-x: hidden;
     }
 
     .container {
@@ -109,6 +110,10 @@
 
     /* Mobile Responsive */
     @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
       h1 {
         font-size: 2em;
       }
@@ -129,17 +134,44 @@
     }
 
     @media (max-width: 480px) {
+      body {
+        padding: 10px;
+        min-height: 100dvh; /* Dynamic viewport height */
+      }
+
       h1 {
         font-size: 1.5em;
       }
 
       header {
-        margin-bottom: 20px;
-        padding: 10px;
+        margin-bottom: 15px;
+        padding: 10px 5px;
       }
 
       .image-card {
         border-radius: 10px;
+      }
+
+      .gallery {
+        padding: 5px;
+        gap: 15px;
+      }
+
+      .image-preview {
+        height: 180px;
+      }
+
+      .image-info {
+        padding: 15px;
+      }
+
+      .image-title {
+        font-size: 1.1em;
+      }
+
+      .play-button {
+        padding: 10px 20px;
+        font-size: 0.95em;
       }
     }
 
@@ -180,14 +212,16 @@
   </div>
 
   <script>
-    // Image database - Add your images here
+    // Image database - Only images from the 'images' folder
     const images = [
-      { id: 1, src: 'product.jpg', title: 'Product Image' },
-      { id: 2, src: 'https://picsum.photos/450/450?random=1', title: 'Nature Scene' },
-      { id: 3, src: 'https://picsum.photos/450/450?random=2', title: 'City View' },
-      { id: 4, src: 'https://picsum.photos/450/450?random=3', title: 'Abstract Art' },
-      { id: 5, src: 'https://picsum.photos/450/450?random=4', title: 'Landscape' },
-      { id: 6, src: 'https://picsum.photos/450/450?random=5', title: 'Ocean Waves' }
+      { id: 1, src: 'images/product.jpg', title: 'Product Image' },
+      { id: 2, src: 'images/photo1.jpeg', title: 'Photo 1' },
+      { id: 3, src: 'images/photo2.jpg', title: 'Photo 2' },
+      { id: 4, src: 'images/photo3.jpeg', title: 'Photo 3' },
+      { id: 5, src: 'images/photo4.jpg', title: 'Photo 4' },
+      { id: 6, src: 'images/photo5.jpeg', title: 'Photo 5' },
+      { id: 7, src: 'images/photo7.jpg', title: 'Photo 7' },
+      { id: 8, src: 'images/photo8.jpg', title: 'Photo 8' }
     ];
 
     const gallery = document.getElementById('gallery');
