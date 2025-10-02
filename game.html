@@ -413,16 +413,29 @@
       if (e.target.classList.contains("piece")) {
         e.target.classList.remove('drag-over');
       }
-      
-      if (e.target.classList.contains("piece") && dragged !== e.target) {
-        const draggedIndex = [...puzzle.children].indexOf(dragged);
-        const targetIndex = [...puzzle.children].indexOf(e.target);
 
-        if (draggedIndex > targetIndex) {
-          puzzle.insertBefore(dragged, e.target);
+      if (e.target.classList.contains("piece") && dragged !== e.target) {
+        // Get parent nodes
+        const draggedParent = dragged.parentNode;
+        const targetParent = e.target.parentNode;
+
+        // Get next siblings to remember positions
+        const draggedNext = dragged.nextSibling;
+        const targetNext = e.target.nextSibling;
+
+        // Swap the pieces
+        if (draggedNext === e.target) {
+          // Adjacent pieces - special case
+          draggedParent.insertBefore(e.target, dragged);
+        } else if (targetNext === dragged) {
+          // Adjacent pieces - special case (reverse)
+          targetParent.insertBefore(dragged, e.target);
         } else {
-          puzzle.insertBefore(dragged, e.target.nextSibling);
+          // Non-adjacent pieces - swap positions
+          draggedParent.insertBefore(e.target, draggedNext);
+          targetParent.insertBefore(dragged, targetNext);
         }
+
         checkWin();
       }
     });
@@ -440,22 +453,35 @@
     puzzle.addEventListener("touchend", e => {
       if (touchStartPiece) {
         touchStartPiece.classList.remove('dragging');
-        
+
         const touch = e.changedTouches[0];
         const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
-        
-        if (targetElement && targetElement.classList.contains("piece") && touchStartPiece !== targetElement) {
-          const draggedIndex = [...puzzle.children].indexOf(touchStartPiece);
-          const targetIndex = [...puzzle.children].indexOf(targetElement);
 
-          if (draggedIndex > targetIndex) {
-            puzzle.insertBefore(touchStartPiece, targetElement);
+        if (targetElement && targetElement.classList.contains("piece") && touchStartPiece !== targetElement) {
+          // Get parent nodes
+          const draggedParent = touchStartPiece.parentNode;
+          const targetParent = targetElement.parentNode;
+
+          // Get next siblings to remember positions
+          const draggedNext = touchStartPiece.nextSibling;
+          const targetNext = targetElement.nextSibling;
+
+          // Swap the pieces
+          if (draggedNext === targetElement) {
+            // Adjacent pieces - special case
+            draggedParent.insertBefore(targetElement, touchStartPiece);
+          } else if (targetNext === touchStartPiece) {
+            // Adjacent pieces - special case (reverse)
+            targetParent.insertBefore(touchStartPiece, targetElement);
           } else {
-            puzzle.insertBefore(touchStartPiece, targetElement.nextSibling);
+            // Non-adjacent pieces - swap positions
+            draggedParent.insertBefore(targetElement, draggedNext);
+            targetParent.insertBefore(touchStartPiece, targetNext);
           }
+
           checkWin();
         }
-        
+
         touchStartPiece = null;
       }
     }, { passive: true });
