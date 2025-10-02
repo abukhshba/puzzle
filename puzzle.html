@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Puzzle Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #222;
+    }
+    #puzzle {
+      display: grid;
+      grid-template-columns: repeat(3, 150px);
+      grid-template-rows: repeat(3, 150px);
+      gap: 2px;
+      border: 4px solid #fff;
+      background: #fff;
+    }
+    .piece {
+      width: 150px;
+      height: 150px;
+      background-image: url("product.jpg"); /* ← صورة المنتج */
+      background-size: 450px 450px;
+      cursor: grab;
+    }
+  </style>
+</head>
+<body>
+  <div id="puzzle"></div>
+
+  <script>
+    const puzzle = document.getElementById("puzzle");
+    let positions = [];
+
+    // تقسيم الصورة إلى 9 قطع
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        const piece = document.createElement("div");
+        piece.classList.add("piece");
+        piece.style.backgroundPosition = `-${col * 150}px -${row * 150}px`;
+        piece.dataset.correct = row * 3 + col;
+        positions.push(piece);
+      }
+    }
+
+    // خلط العشوائي
+    positions.sort(() => Math.random() - 0.5);
+    positions.forEach(p => puzzle.appendChild(p));
+
+    // تفعيل Drag & Drop
+    let dragged;
+
+    puzzle.addEventListener("dragstart", e => {
+      if (e.target.classList.contains("piece")) {
+        dragged = e.target;
+      }
+    });
+
+    puzzle.addEventListener("dragover", e => {
+      e.preventDefault();
+    });
+
+    puzzle.addEventListener("drop", e => {
+      if (e.target.classList.contains("piece") && dragged !== e.target) {
+        const draggedIndex = [...puzzle.children].indexOf(dragged);
+        const targetIndex = [...puzzle.children].indexOf(e.target);
+
+        if (draggedIndex > targetIndex) {
+          puzzle.insertBefore(dragged, e.target);
+        } else {
+          puzzle.insertBefore(dragged, e.target.nextSibling);
+        }
+      }
+      checkWin();
+    });
+
+    // التحقق من الفوز
+    function checkWin() {
+      const pieces = [...puzzle.children];
+      const isCorrect = pieces.every(
+        (p, i) => parseInt(p.dataset.correct) === i
+      );
+      if (isCorrect) {
+        setTimeout(() => alert("🎉 مبروك! كملت البازل"), 200);
+      }
+    }
+  </script>
+</body>
+</html>

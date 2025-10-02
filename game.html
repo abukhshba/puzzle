@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puzzle Game - Play</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .home-button {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .home-button:hover {
+      background: white;
+      color: #667eea;
+    }
+
+    .timer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.2);
+      padding: 10px 20px;
+      border-radius: 25px;
+      color: white;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .timer.warning {
+      background: rgba(255,0,0,0.3);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .game-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #puzzle {
+      display: grid;
+      grid-template-columns: repeat(3, 150px);
+      grid-template-rows: repeat(3, 150px);
+      gap: 2px;
+      border: 4px solid #fff;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      touch-action: none;
+    }
+
+    .piece {
+      width: 150px;
+      height: 150px;
+      background-size: 450px 450px;
+      cursor: grab;
+      transition: transform 0.1s ease;
+      position: relative;
+    }
+
+    .piece:active {
+      cursor: grabbing;
+      transform: scale(1.05);
+      z-index: 1000;
+    }
+
+    .piece.dragging {
+      opacity: 0.5;
+    }
+
+    .piece.drag-over {
+      border: 2px solid #667eea;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      #puzzle {
+        grid-template-columns: repeat(3, 100px);
+        grid-template-rows: repeat(3, 100px);
+      }
+
+      .piece {
+        width: 100px;
+        height: 100px;
+        background-size: 300px 300px;
+      }
+
+      .timer {
+        font-size: 1.2em;
+        padding: 8px 15px;
+      }
+
+      .home-button {
+        padding: 8px 15px;
+        font-size: 0.9em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #puzzle {
+        grid-template-columns: repeat(3, 80px);
+        grid-template-rows: repeat(3, 80px);
+      }
+
+      .piece {
+        width: 80px;
+        height: 80px;
+        background-size: 240px 240px;
+      }
+
+      .timer {
+        font-size: 1em;
+        padding: 6px 12px;
+      }
+
+      .home-button {
+        padding: 6px 12px;
+        font-size: 0.8em;
+      }
+
+      .header {
+        padding: 10px;
+      }
+    }
+
+    /* Success Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 90%;
+      animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-content h2 {
+      font-size: 2.5em;
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+
+    .modal-content p {
+      font-size: 1.2em;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .modal-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 25px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .modal-button.secondary {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    @media (max-width: 480px) {
+      .modal-content {
+        padding: 30px 20px;
+      }
+
+      .modal-content h2 {
+        font-size: 1.8em;
+      }
+
+      .modal-content p {
+        font-size: 1em;
+      }
+
+      .modal-button {
+        padding: 12px 20px;
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <button class="home-button" onclick="goHome()">🏠 Home</button>
+    <div class="timer" id="timer">
+      ⏱️ <span id="time">2:00</span>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <div id="puzzle"></div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <h2>🎉 Congratulations!</h2>
+      <p>You completed the puzzle in <span id="completionTime"></span>!</p>
+      <div class="modal-buttons">
+        <button class="modal-button" onclick="goHome()">🏠 Select Another Image</button>
+        <button class="modal-button secondary" onclick="playAgain()">🔄 Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const puzzle = document.getElementById("puzzle");
+    const timerDisplay = document.getElementById("time");
+    const timerElement = document.getElementById("timer");
+    const successModal = document.getElementById("successModal");
+    const completionTimeSpan = document.getElementById("completionTime");
+    
+    let positions = [];
+    let dragged;
+    let timeLeft = 120; // 2 minutes in seconds
+    let timerInterval;
+    let gameStartTime;
+    let gameCompleted = false;
+
+    // Get selected image from localStorage
+    const selectedImage = JSON.parse(localStorage.getItem('selectedImage'));
+    if (!selectedImage) {
+      window.location.href = 'index.html';
+    }
+
+    // Calculate piece size based on screen width
+    function getPieceSize() {
+      const width = window.innerWidth;
+      if (width <= 480) return 80;
+      if (width <= 768) return 100;
+      return 150;
+    }
+
+    // Initialize puzzle
+    function initPuzzle() {
+      const pieceSize = getPieceSize();
+      const totalSize = pieceSize * 3;
+      
+      puzzle.style.gridTemplateColumns = `repeat(3, ${pieceSize}px)`;
+      puzzle.style.gridTemplateRows = `repeat(3, ${pieceSize}px)`;
+      
+      positions = [];
+      puzzle.innerHTML = '';
+
+      // Create 9 pieces
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 3; col++) {
+          const piece = document.createElement("div");
+          piece.classList.add("piece");
+          piece.style.width = `${pieceSize}px`;
+          piece.style.height = `${pieceSize}px`;
+          piece.style.backgroundImage = `url("${selectedImage.src}")`;
+          piece.style.backgroundSize = `${totalSize}px ${totalSize}px`;
+          piece.style.backgroundPosition = `-${col * pieceSize}px -${row * pieceSize}px`;
+          piece.dataset.correct = row * 3 + col;
+          piece.draggable = true;
+          positions.push(piece);
+        }
+      }
+
+      // Shuffle randomly
+      positions.sort(() => Math.random() - 0.5);
+      positions.forEach(p => puzzle.appendChild(p));
+
+      // Start timer
+      startTimer();
+    }
+
+    // Timer function
+    function startTimer() {
+      gameStartTime = Date.now();
+      timerInterval = setInterval(() => {
+        if (gameCompleted) {
+          clearInterval(timerInterval);
+          return;
+        }
+
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 30) {
+          timerElement.classList.add('warning');
+        }
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          alert('⏰ Time\'s up! Try again!');
+          initPuzzle();
+          timeLeft = 120;
+          timerElement.classList.remove('warning');
+        }
+      }, 1000);
+    }
+
+    // Drag and Drop for Desktop
+    puzzle.addEventListener("dragstart", e => {
+      if (e.target.classList.contains("piece")) {
+        dragged = e.target;
+        e.target.classList.add('dragging');
+      }
+    });
+
+    puzzle.addEventListener("dragend", e => {
+      if (e.target.classList.contains("piece")) {
+        e.target.classList.remove('dragging');
+      }
+    });
+
+    puzzle.addEventListener("dragover", e => {
+      e.preventDefault();
+      if (e.target.classList.contains("piece")) {
+        e.target.classList.add('drag-over');
+      }
+    });
+
+    puzzle.addEventListener("dragleave", e => {
+      if (e.target.classList.contains("piece")) {
+        e.target.classList.remove('drag-over');
+      }
+    });
+
+    puzzle.addEventListener("drop", e => {
+      e.preventDefault();
+      if (e.target.classList.contains("piece")) {
+        e.target.classList.remove('drag-over');
+      }
+      
+      if (e.target.classList.contains("piece") && dragged !== e.target) {
+        const draggedIndex = [...puzzle.children].indexOf(dragged);
+        const targetIndex = [...puzzle.children].indexOf(e.target);
+
+        if (draggedIndex > targetIndex) {
+          puzzle.insertBefore(dragged, e.target);
+        } else {
+          puzzle.insertBefore(dragged, e.target.nextSibling);
+        }
+        checkWin();
+      }
+    });
+
+    // Touch support for mobile
+    let touchStartPiece = null;
+
+    puzzle.addEventListener("touchstart", e => {
+      if (e.target.classList.contains("piece")) {
+        touchStartPiece = e.target;
+        e.target.classList.add('dragging');
+      }
+    }, { passive: true });
+
+    puzzle.addEventListener("touchend", e => {
+      if (touchStartPiece) {
+        touchStartPiece.classList.remove('dragging');
+        
+        const touch = e.changedTouches[0];
+        const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (targetElement && targetElement.classList.contains("piece") && touchStartPiece !== targetElement) {
+          const draggedIndex = [...puzzle.children].indexOf(touchStartPiece);
+          const targetIndex = [...puzzle.children].indexOf(targetElement);
+
+          if (draggedIndex > targetIndex) {
+            puzzle.insertBefore(touchStartPiece, targetElement);
+          } else {
+            puzzle.insertBefore(touchStartPiece, targetElement.nextSibling);
+          }
+          checkWin();
+        }
+        
+        touchStartPiece = null;
+      }
+    }, { passive: true });
+
+    // Check win condition
+    function checkWin() {
+      const pieces = [...puzzle.children];
+      const isCorrect = pieces.every((p, i) => parseInt(p.dataset.correct) === i);
+      
+      if (isCorrect && !gameCompleted) {
+        gameCompleted = true;
+        clearInterval(timerInterval);
+        
+        const elapsedTime = Math.floor((Date.now() - gameStartTime) / 1000);
+        const minutes = Math.floor(elapsedTime / 60);
+        const seconds = elapsedTime % 60;
+        completionTimeSpan.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        setTimeout(() => {
+          successModal.classList.add('show');
+        }, 300);
+      }
+    }
+
+    // Navigation functions
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    function playAgain() {
+      successModal.classList.remove('show');
+      gameCompleted = false;
+      timeLeft = 120;
+      timerElement.classList.remove('warning');
+      initPuzzle();
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      const currentPieceSize = getPieceSize();
+      const pieces = puzzle.querySelectorAll('.piece');
+      const totalSize = currentPieceSize * 3;
+      
+      puzzle.style.gridTemplateColumns = `repeat(3, ${currentPieceSize}px)`;
+      puzzle.style.gridTemplateRows = `repeat(3, ${currentPieceSize}px)`;
+      
+      pieces.forEach(piece => {
+        piece.style.width = `${currentPieceSize}px`;
+        piece.style.height = `${currentPieceSize}px`;
+        piece.style.backgroundSize = `${totalSize}px ${totalSize}px`;
+        
+        const correct = parseInt(piece.dataset.correct);
+        const row = Math.floor(correct / 3);
+        const col = correct % 3;
+        piece.style.backgroundPosition = `-${col * currentPieceSize}px -${row * currentPieceSize}px`;
+      });
+    });
+
+    // Initialize game
+    initPuzzle();
+  </script>
+</body>
+</html>
+

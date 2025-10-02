@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Puzzle Game - Select Image</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      font-size: 1.2em;
+      opacity: 0.9;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      padding: 20px;
+    }
+
+    .image-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .image-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+
+    .image-card:active {
+      transform: translateY(-5px);
+    }
+
+    .image-preview {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-info {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .image-title {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .play-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .play-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .play-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      .subtitle {
+        font-size: 1em;
+      }
+
+      .gallery {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 10px;
+      }
+
+      .image-preview {
+        height: 200px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5em;
+      }
+
+      header {
+        margin-bottom: 20px;
+        padding: 10px;
+      }
+
+      .image-card {
+        border-radius: 10px;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      text-align: center;
+      color: white;
+      font-size: 1.5em;
+      padding: 50px;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧩 Puzzle Game</h1>
+      <p class="subtitle">Select an image to start the puzzle challenge!</p>
+    </header>
+
+    <div class="gallery" id="gallery">
+      <!-- Images will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    // Image database - Add your images here
+    const images = [
+      { id: 1, src: 'product.jpg', title: 'Product Image' },
+      { id: 2, src: 'https://picsum.photos/450/450?random=1', title: 'Nature Scene' },
+      { id: 3, src: 'https://picsum.photos/450/450?random=2', title: 'City View' },
+      { id: 4, src: 'https://picsum.photos/450/450?random=3', title: 'Abstract Art' },
+      { id: 5, src: 'https://picsum.photos/450/450?random=4', title: 'Landscape' },
+      { id: 6, src: 'https://picsum.photos/450/450?random=5', title: 'Ocean Waves' }
+    ];
+
+    const gallery = document.getElementById('gallery');
+
+    // Load images into gallery
+    function loadGallery() {
+      gallery.innerHTML = '';
+      
+      images.forEach(image => {
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        card.onclick = () => startGame(image);
+        
+        card.innerHTML = `
+          <img src="${image.src}" alt="${image.title}" class="image-preview" loading="lazy">
+          <div class="image-info">
+            <div class="image-title">${image.title}</div>
+            <button class="play-button">Play Puzzle</button>
+          </div>
+        `;
+        
+        gallery.appendChild(card);
+      });
+    }
+
+    // Start game with selected image
+    function startGame(image) {
+      // Store selected image in localStorage
+      localStorage.setItem('selectedImage', JSON.stringify(image));
+      // Navigate to game page
+      window.location.href = 'game.html';
+    }
+
+    // Initialize gallery on page load
+    loadGallery();
+  </script>
+</body>
+</html>
+
