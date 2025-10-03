@@ -13,7 +13,7 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
       min-height: 100vh;
       padding: 20px;
       overflow-x: hidden;
@@ -25,22 +25,52 @@
     }
 
     header {
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       color: white;
-      margin-bottom: 20px;
-      padding: 15px 20px;
+      margin-bottom: 30px;
+      padding: 15px 30px;
+      background: rgba(76, 175, 80, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 2px solid rgba(139, 195, 74, 0.4);
+      flex-wrap: wrap;
+      gap: 20px;
     }
 
-    h1 {
-      font-size: 3em;
-      margin-bottom: 10px;
+    .logo-container {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .game-logo {
+      height: 80px;
+      width: auto;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+      transition: transform 0.3s ease;
+    }
+
+    .game-logo:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .page-title {
+      color: white;
+      font-size: 2em;
+      font-weight: bold;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin: 0;
     }
 
-    .subtitle {
-      font-size: 1.2em;
-      opacity: 0.9;
-    }
+
 
     .gallery {
       display: grid;
@@ -52,17 +82,19 @@
     }
 
     .image-card {
-      background: white;
+      background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
       border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0,0,0,0.3);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
+      border: 3px solid rgba(139, 195, 74, 0.5);
     }
 
     .image-card:hover {
       transform: translateY(-10px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+      border-color: #8bc34a;
     }
 
     .image-card:active {
@@ -84,12 +116,12 @@
     .image-title {
       font-size: 1.3em;
       font-weight: bold;
-      color: #333;
+      color: #33691e;
       margin-bottom: 10px;
     }
 
     .play-button {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #689f38 0%, #8bc34a 100%);
       color: white;
       border: none;
       padding: 12px 30px;
@@ -103,7 +135,7 @@
 
     .play-button:hover {
       transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
     }
 
     .play-button:active {
@@ -132,11 +164,42 @@
 
       header {
         margin-bottom: 15px;
-        padding: 10px;
+        padding: 15px 20px;
+      }
+
+      .game-logo {
+        height: 65px;
+      }
+
+      .page-title {
+        font-size: 1.5em;
       }
 
       .image-preview {
         height: 350px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        justify-content: center;
+        padding: 12px 15px;
+      }
+
+      .logo-container {
+        margin: 0 auto;
+      }
+
+      .game-logo {
+        height: 50px;
+      }
+
+      .nav-right {
+        display: none;
+      }
+
+      .page-title {
+        display: none;
       }
     }
 
@@ -146,13 +209,12 @@
         min-height: 100dvh; /* Dynamic viewport height */
       }
 
-      h1 {
-        font-size: 1.5em;
+      header {
+        margin-bottom: 15px;
       }
 
-      header {
-        margin-bottom: 10px;
-        padding: 8px 5px;
+      .game-logo {
+        height: 45px;
       }
 
       .image-card {
@@ -210,8 +272,12 @@
 <body>
   <div class="container">
     <header>
-      <h1>🧩 Puzzle Game</h1>
-      <p class="subtitle">Select an image to start the puzzle challenge!</p>
+      <div class="logo-container" onclick="window.location.href='index.html'">
+        <img src="images/logo.jpg" alt="Dar El Salam Logo" class="game-logo">
+      </div>
+      <div class="nav-right">
+        <h1 class="page-title">🌾 Puzzle Game 🌾</h1>
+      </div>
     </header>
 
     <div class="gallery" id="gallery">
